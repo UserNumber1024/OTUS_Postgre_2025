@@ -1,20 +1,26 @@
 ## 1) Выполнить pgbench -c8 -P 6 -T 60 -U postgres postgres.
+### init
+```
+отключение autovacuum в конфиге
+net stop postgresql-x64-17
+net start postgresql-x64-17
+```
 ### input
 * pgbench -i postgres
 * pgbench -c8 -P 6 -T 60 -U postgres postgres
 
 ### Output
 ```
-progress: 6.0 s, 2713.0 tps, lat 2.768 ms stddev 1.959, 0 failed
-progress: 12.0 s, 2953.5 tps, lat 2.702 ms stddev 1.773, 0 failed
-progress: 18.0 s, 2992.8 tps, lat 2.666 ms stddev 1.345, 0 failed
-progress: 24.0 s, 2893.8 tps, lat 2.758 ms stddev 1.859, 0 failed
-progress: 30.0 s, 2918.8 tps, lat 2.734 ms stddev 2.017, 0 failed
-progress: 36.0 s, 3016.4 tps, lat 2.645 ms stddev 1.368, 0 failed
-progress: 42.0 s, 2932.6 tps, lat 2.721 ms stddev 1.856, 0 failed
-progress: 48.0 s, 2868.2 tps, lat 2.782 ms stddev 1.441, 0 failed
-progress: 54.0 s, 2489.5 tps, lat 3.191 ms stddev 1.590, 0 failed
-progress: 60.0 s, 2524.7 tps, lat 3.172 ms stddev 2.209, 0 failed
+progress: 6.0 s, 2740.8 tps, lat 2.735 ms stddev 2.091, 0 failed
+progress: 12.0 s, 3032.7 tps, lat 2.631 ms stddev 1.332, 0 failed
+progress: 18.0 s, 2999.2 tps, lat 2.660 ms stddev 1.513, 0 failed
+progress: 24.0 s, 3070.0 tps, lat 2.598 ms stddev 1.304, 0 failed
+progress: 30.0 s, 2976.5 tps, lat 2.681 ms stddev 1.589, 0 failed
+progress: 36.0 s, 2995.2 tps, lat 2.664 ms stddev 1.355, 0 failed
+progress: 42.0 s, 2440.8 tps, lat 3.270 ms stddev 23.601, 0 failed
+progress: 48.0 s, 2982.0 tps, lat 2.676 ms stddev 1.332, 0 failed
+progress: 54.0 s, 2953.5 tps, lat 2.701 ms stddev 1.476, 0 failed
+progress: 60.0 s, 2904.2 tps, lat 2.747 ms stddev 1.422, 0 failed
 transaction type: <builtin: TPC-B (sort of)>
 scaling factor: 1
 query mode: simple
@@ -22,12 +28,12 @@ number of clients: 8
 number of threads: 1
 maximum number of tries: 1
 duration: 60 s
-number of transactions actually processed: 169829
+number of transactions actually processed: 174573
 number of failed transactions: 0 (0.000%)
-latency average = 2.803 ms
-latency stddev = 1.765 ms
-initial connection time = 352.400 ms
-tps = 2846.875071 (without initial connection time)
+latency average = 2.726 ms
+latency stddev = 6.987 ms
+initial connection time = 363.968 ms
+tps = 2926.870242 (without initial connection time)
 ```
 ---
 
@@ -47,20 +53,22 @@ autovacuum_vacuum_cost_limit = 1000
 
 ## 3) Заново протестировать: pgbench -c8 -P 6 -T 60 -U postgres postgres и сравнить результаты
 ### input
-* SELECT pg_reload_conf();
-* pgbench -c8 -P 6 -T 60 -U postgres postgres
-### Output
 ```
-progress: 6.0 s, 2635.3 tps, lat 2.854 ms stddev 2.348, 0 failed
-progress: 12.0 s, 3043.3 tps, lat 2.622 ms stddev 1.445, 0 failed
-progress: 18.0 s, 3082.2 tps, lat 2.589 ms stddev 1.255, 0 failed
-progress: 24.0 s, 3048.5 tps, lat 2.617 ms stddev 1.441, 0 failed
-progress: 30.0 s, 3053.7 tps, lat 2.613 ms stddev 1.314, 0 failed
-progress: 36.0 s, 3028.5 tps, lat 2.634 ms stddev 1.453, 0 failed
-progress: 42.0 s, 3022.0 tps, lat 2.640 ms stddev 1.290, 0 failed
-progress: 48.0 s, 2533.3 tps, lat 3.151 ms stddev 1.906, 0 failed
-progress: 54.0 s, 2787.0 tps, lat 2.864 ms stddev 1.735, 0 failed
-progress: 60.0 s, 2818.5 tps, lat 2.831 ms stddev 2.027, 0 failed
+net stop postgresql-x64-17
+net start postgresql-x64-17
+SHOW autovacuum; --on
+```
+### pgbench -c8 -P 6 -T 60 -U postgres postgres
+```
+progress: 6.0 s, 2817.3 tps, lat 2.667 ms stddev 1.896, 0 failed
+progress: 12.0 s, 3078.1 tps, lat 2.592 ms stddev 1.277, 0 failed
+progress: 18.0 s, 3037.5 tps, lat 2.626 ms stddev 1.444, 0 failed
+progress: 24.0 s, 3048.7 tps, lat 2.617 ms stddev 1.453, 0 failed
+progress: 30.0 s, 3059.3 tps, lat 2.608 ms stddev 1.323, 0 failed
+progress: 36.0 s, 2980.6 tps, lat 2.677 ms stddev 1.505, 0 failed
+progress: 42.0 s, 2982.7 tps, lat 2.675 ms stddev 1.576, 0 failed
+progress: 48.0 s, 2981.2 tps, lat 2.676 ms stddev 1.477, 0 failed
+progress: 54.0 s, 2976.0 tps, lat 2.681 ms stddev 1.344, 0 failed
 transaction type: <builtin: TPC-B (sort of)>
 scaling factor: 1
 query mode: simple
@@ -68,13 +76,15 @@ number of clients: 8
 number of threads: 1
 maximum number of tries: 1
 duration: 60 s
-number of transactions actually processed: 174348
+number of transactions actually processed: 179429
 number of failed transactions: 0 (0.000%)
-latency average = 2.731 ms
-latency stddev = 1.646 ms
-initial connection time = 344.109 ms
-tps = 2921.853687 (without initial connection time)
+latency average = 2.652 ms
+latency stddev = 1.500 ms
+initial connection time = 348.240 ms
+tps = 3008.057458 (without initial connection time)
 ```
+* существенно уменьшилось latency stddev, стандартное отклонение задержки выполнения транзакций
+
 ---
 
 ## 4) Создать таблицу с текстовым полем и заполнить случайными или сгенерированными данными в размере 1 млн строк
