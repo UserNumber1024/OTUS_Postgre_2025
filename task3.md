@@ -80,6 +80,7 @@ analyze test;
 ## 4) Сравнить применение различных типов индексов.
 
 ### create index on test (email);
+* explain analyze select * from test where email ilike '%123456%'
 ```
 "Gather  (cost=1000.00..28441.33 rows=100 width=145) (actual time=34.785..694.973 rows=13 loops=1)"
 "  Workers Planned: 2"
@@ -90,12 +91,12 @@ analyze test;
 "Planning Time: 0.344 ms"
 "Execution Time: 694.995 ms"
 ```
-#### Обычный индекс для текстового поиска не работает 
+* Обычный (btree) индекс для поиска like-конструкции не работает 
 
 ### create index email_search_idx on test using GIN (email gin_trgm_ops)
 * CREATE EXTENSION IF NOT EXISTS pg_trgm;
 * drop previos index on email
-
+* explain analyze select * from test where email ilike '%123456%'
 ```
 "Bitmap Heap Scan on test  (cost=117.26..498.38 rows=100 width=145) (actual time=1.598..1.630 rows=13 loops=1)"
 "  Recheck Cond: (email ~~* '%123456%'::text)"
@@ -106,5 +107,5 @@ analyze test;
 "Planning Time: 7.209 ms"
 "Execution Time: 1.652 ms"
 ```
-#### Специализированный индекс для like-конструкций по строке работает 
+* Специализированный (Gin) индекс для like-конструкций по строке работает 
 ---
